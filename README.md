@@ -33,3 +33,27 @@ A full-stack web application developed as part of the Sysslan IT Solutions Full 
 2. Run `npm install`.
 3. Run `npm run dev`.
 4. Open the local URL shown in the terminal.
+
+
+### Level 2 – Backend Setup Completed
+
+**Status:** Completed
+
+**Technologies Used:** Node.js, Express.js, CORS, Nodemon.
+
+**Features Implemented**
+- Express backend server running on port 5000
+- Welcome API: `GET /api`
+- Feedback submission API: `POST /api/feedback`
+- Feedback retrieval API: `GET /api/feedback`
+- Request body parsing using Express JSON middleware
+- Frontend-to-backend integration using the Fetch API
+- Basic required-field validation
+
+**Current Limitation:** Feedback is stored temporarily in an in-memory array. Data will be lost when the server restarts.
+
+### Next: Level 3 – Database Basics
+
+- Create a MySQL database and feedback table
+- Store feedback permanently
+- Retrieve feedback from MySQL

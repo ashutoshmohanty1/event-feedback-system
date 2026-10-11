@@ -28,7 +28,8 @@ function Feedback() {
     setSuccess(false);
   }
 
-  function handleSubmit(e) {
+  
+  async function handleSubmit(e) {
     e.preventDefault();
 
     if (
@@ -42,19 +43,41 @@ function Feedback() {
       return;
     }
 
-    setError('');
-    setSuccess(true);
+    try {
+      setError('');
+      setSuccess(false);
 
-    console.log('Feedback submitted:', formData);
+      const response = await fetch(
+        'http://localhost:5000/api/feedback',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        }
+      );
 
-    setFormData({
-      name: '',
-      email: '',
-      event: '',
-      rating: 0,
-      comments: '',
-    });
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to submit feedback.');
+      }
+
+      setSuccess(true);
+
+      setFormData({
+        name: '',
+        email: '',
+        event: '',
+        rating: 0,
+        comments: '',
+      });
+    } catch (error) {
+      setError(error.message || 'Unable to connect to the server.');
+    }
   }
+
 
   return (
     <main className="container py-5">
