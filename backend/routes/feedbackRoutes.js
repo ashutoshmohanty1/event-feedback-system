@@ -1,54 +1,101 @@
-
 const express = require('express');
+const db = require('../config/db');
 
 const router = express.Router();
 
-let feedbackList = [];
-let nextId = 1;
+// POST: Submit feedback and save it in MySQL
+router.post('/', async (req, res) => {
+  try {
+    const { name, email, event, rating, comments } = req.body;
 
-// Submit feedback
-router.post('/', (req, res) => {
-  const { name, email, event, rating, comments } = req.body;
+    // Validate required fields
+    if (
+      !name?.trim() ||
+      !email?.trim() ||
+      !event?.trim() ||
+      rating === undefined ||
+      rating === null ||
+      rating === '' ||
+      !comments?.trim()
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide all required feedback fields.',
+      });
+    }
 
-  if (
-    !name?.trim() ||
-    !email?.trim() ||
-    !event ||
-    !rating ||
-    !comments?.trim()
-  ) {
-    return res.status(400).json({
+    // Validate rating
+    const numericRating = Number(rating);
+
+    if (
+      !Number.isInteger(numericRating) ||
+      numericRating < 1 ||
+      numericRating > 5
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: 'Rating must be an integer between 1 and 5.',
+      });
+    }
+
+    // Insert feedback into MySQL
+    const sql = `
+      INSERT INTO feedback (name, email, event, rating, comments)
+      VALUES (?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+      name.trim(),
+      email.trim(),
+      event.trim(),
+      numericRating,
+      comments.trim(),
+    ];
+
+    const [result] = await db.execute(sql, values);
+
+    // Retrieve the newly inserted feedback
+    const [rows] = await db.execute(
+      'SELECT * FROM feedback WHERE id = ?',
+      [result.insertId]
+    );
+
+    // Send success response
+    return res.status(201).json({
+      success: true,
+      message: 'Feedback submitted successfully!',
+      data: rows[0],
+    });
+  } catch (error) {
+    console.error('Error saving feedback:', error.message);
+
+    return res.status(500).json({
       success: false,
-      message: 'Please provide all required feedback fields.',
+      message: 'Unable to save feedback. Please try again.',
     });
   }
-
-  const feedback = {
-    id: nextId++,
-    name: name.trim(),
-    email: email.trim(),
-    event,
-    rating: Number(rating),
-    comments: comments.trim(),
-    createdAt: new Date().toISOString(),
-  };
-
-  feedbackList.push(feedback);
-
-  res.status(201).json({
-    success: true,
-    message: 'Feedback submitted successfully!',
-    data: feedback,
-  });
 });
 
-// Get all feedback
-router.get('/', (req, res) => {
-  res.json({
-    success: true,
-    count: feedbackList.length,
-    data: feedbackList,
-  });
+// GET: Retrieve all feedback from MySQL
+router.get('/', async (req, res) => {
+  try {
+    const [rows] = await db.execute(
+      'SELECT * FROM feedback ORDER BY created_at DESC'
+    );
+
+    return res.status(200).json({
+      success: true,
+      count: rows.length,
+      data: rows,
+    });
+  } catch (error) {
+    console.error('Error fetching feedback:', error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: 'Unable to fetch feedback.',
+    });
+  }
 });
 
 module.exports = router;
