@@ -1,10 +1,10 @@
 # Event Feedback Management System
 
-A full-stack web application developed as part of the **Sysslan IT Solutions Full Stack Development Internship**. The application allows users to explore events, submit feedback, and save feedback data in a MySQL database.
+A full-stack web application developed as part of the **Sysslan IT Solutions Full Stack Development Internship**. The application allows users to explore events, submit feedback, and view saved feedback records retrieved from a MySQL database.
 
 ## Project Overview
 
-The Event Feedback Management System provides a simple interface for collecting event participants' opinions and ratings. It combines a React frontend with a Node.js and Express backend and a MySQL database.
+The Event Feedback Management System collects and displays participants' opinions about events. It provides a responsive React frontend, a Node.js and Express backend, and a MySQL database for persistent feedback storage.
 
 ## Technologies Used
 
@@ -12,7 +12,8 @@ The Event Feedback Management System provides a simple interface for collecting 
 - React.js
 - Vite
 - JavaScript
-- HTML5 and CSS3
+- HTML5
+- CSS3
 - Bootstrap 5
 - React Router
 - Fetch API
@@ -31,20 +32,21 @@ The Event Feedback Management System provides a simple interface for collecting 
 ## Project Features
 
 ### Level 1 – Frontend Development: Completed
-- Responsive navigation bar with Home, Events, and Feedback pages
+- Responsive navigation bar
 - Homepage with a modern hero section and feature cards
 - Events page with sample event cards
-- Feedback form with event selection
+- Feedback submission form
+- Event selection
 - Interactive star-rating system
 - Client-side form validation
-- Responsive layout using Bootstrap 5
+- Responsive Bootstrap layout
 - Reusable Navbar and Footer components
 - User-friendly success and error messages
 
 ### Level 2 – Backend Setup: Completed
 - Express.js backend server running on port 5000
 - Welcome API: `GET /api`
-- Feedback submission endpoint: `POST /api/feedback`
+- Feedback submission API: `POST /api/feedback`
 - Feedback retrieval API: `GET /api/feedback`
 - JSON request-body parsing
 - CORS configuration for frontend-backend communication
@@ -53,27 +55,33 @@ The Event Feedback Management System provides a simple interface for collecting 
 
 ### Level 3 – Database Integration: Completed
 - MySQL database: `event_feedback_db`
-- Feedback table with fields for ID, name, email, event, rating, comments, and submission timestamp
-- Permanent storage of submitted feedback in MySQL
-- Retrieval of saved feedback records from the database
-- Newest feedback records returned first
+- Feedback table with ID, name, email, event, rating, comments, and submission timestamp
+- Permanent storage of submitted feedback
+- Retrieval of saved feedback records from MySQL
+- Feedback records returned in newest-first order
 
-### Level 4 – Frontend and Backend Integration: Partially Completed
+### Level 4 – Frontend and Backend Integration: Completed
 - React feedback form connected to the backend using the Fetch API
 - Feedback submitted through the form is saved in MySQL
 - Success and error messages displayed to the user
-- Required-field and rating validation implemented
-
-**Remaining verification:** Confirm that saved feedback records are also displayed in a frontend list or feedback page, as required by the project specification.
+- Client-side and server-side validation
+- Dedicated feedback list page at `/feedback-list`
+- Feedback list retrieves records from the backend API
+- Displays participant names, event names, star ratings, comments, and submission dates
+- Navbar includes a **View Feedback** link
+- Loading, empty-list, and error states handled on the feedback list page
 
 ### Level 5 – Final Touch and Review: In Progress
 - Modernized and responsive user interface
-- Consistent styling across the Home, Events, and Feedback pages
-- Navigation and feedback submission flow tested
-- Final review, README verification, and project demonstration preparation
+- Consistent styling across Home, Events, and Feedback pages
+- Navigation between application pages tested
+- Feedback submission and retrieval tested
+- README and project structure documented
+- Final testing and project demonstration preparation
 
 ## Project Structure
 
+```text
 EVENT-FEEDBACK-SYSTEM/
 ├── backend/
 │   ├── config/
@@ -85,16 +93,23 @@ EVENT-FEEDBACK-SYSTEM/
 │   └── .env.example
 ├── frontend/
 │   ├── src/
+│   │   ├── components/
+│   │   │   ├── Navbar.jsx
+│   │   │   └── Footer.jsx
 │   │   ├── pages/
 │   │   │   ├── Home.jsx
 │   │   │   ├── Events.jsx
-│   │   │   └── Feedback.jsx
+│   │   │   ├── Feedback.jsx
+│   │   │   └── FeedbackList.jsx
 │   │   ├── App.jsx
 │   │   ├── main.jsx
 │   │   └── index.css
 │   └── package.json
 ├── .gitignore
 └── README.md
+```
+
+**Security note:** The actual `backend/.env` file is intentionally excluded from this structure because it contains local configuration and potentially sensitive credentials. Never commit real database passwords to GitHub.
 
 ## Database Setup
 
@@ -102,14 +117,19 @@ EVENT-FEEDBACK-SYSTEM/
 
 Open MySQL Workbench or your preferred MySQL client and execute:
 
+```sql
 CREATE DATABASE event_feedback_db;
+```
 
 ### 2. Select the Database
 
+```sql
 USE event_feedback_db;
+```
 
 ### 3. Create the Feedback Table
 
+```sql
 CREATE TABLE feedback (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -119,6 +139,7 @@ CREATE TABLE feedback (
     comments TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+```
 
 If the database and table already exist, you do not need to create them again.
 
@@ -126,15 +147,27 @@ If the database and table already exist, you do not need to create them again.
 
 Create a `.env` file inside the `backend` directory with your local MySQL settings:
 
+```env
 PORT=5000
 DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=your_mysql_password
 DB_NAME=event_feedback_db
+```
 
-Replace `your_mysql_password` with your own MySQL password.
+Replace `your_mysql_password` with your local MySQL password.
 
-**Important:** Never commit your actual `.env` file or database credentials to GitHub. Use `.env.example` to document the required variables without including real secrets.
+Create a `backend/.env.example` file to document the required variables without exposing actual credentials:
+
+```env
+PORT=5000
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=your_mysql_password
+DB_NAME=event_feedback_db
+```
+
+Never commit the actual `.env` file or publish real database credentials to GitHub.
 
 ## Running the Application Locally
 
@@ -142,38 +175,47 @@ Replace `your_mysql_password` with your own MySQL password.
 
 Open a terminal in the project root and run:
 
+```powershell
 cd backend
 npm install
 npm run dev
+```
 
-If your `backend/package.json` does not define a `dev` script, use the start command configured in that file.
+If `npm run dev` is not configured in `backend/package.json`, use the start command defined in that file.
 
-The backend should run at:
-
-`http://localhost:5000`
+The backend should run at `http://localhost:5000`.
 
 ### 2. Start the Frontend
 
 Open a second terminal from the project root and run:
 
+```powershell
 cd frontend
 npm install
 npm run dev
+```
 
 Open the local URL displayed by Vite in your terminal.
 
+### 3. Ensure MySQL Is Running
+
+Before submitting feedback, make sure the MySQL server is running and the database connection settings in `backend/.env` are correct.
+
 ## API Endpoints
 
-| Method | Endpoint | Purpose |
+| Method | Endpoint | Description |
 |---|---|---|
 | GET | `/api` | Check the welcome API |
 | POST | `/api/feedback` | Submit and save feedback |
-| GET | `/api/feedback` | Retrieve saved feedback |
+| GET | `/api/feedback` | Retrieve saved feedback records |
+
+### Feedback Submission Request
 
 The POST endpoint expects a JSON body containing `name`, `email`, `event`, `rating`, and `comments`.
 
 Example request:
 
+```json
 {
   "name": "Rahul Kumar",
   "email": "rahul@example.com",
@@ -181,35 +223,55 @@ Example request:
   "rating": 5,
   "comments": "The event was informative and well organized."
 }
+```
+
+### Feedback Retrieval
+
+The GET endpoint retrieves saved feedback records from MySQL, including participant details, ratings, comments, and submission timestamps.
+
+## Application Pages
+
+| Page | Route | Purpose |
+|---|---|---|
+| Home | `/` | Introduces the application |
+| Events | `/events` | Displays sample events |
+| Feedback | `/feedback` | Allows participants to submit feedback |
+| View Feedback | `/feedback-list` | Displays saved feedback records |
 
 ## Testing
 
 The following functionality has been tested during development:
+
 - Backend server startup
 - MySQL database connection
-- Feedback submission through the API and frontend form
+- Feedback submission through the frontend form
 - Saving feedback records in MySQL
 - Retrieving feedback records through the API
-- Frontend navigation and form validation
-
-**Note:** Displaying the retrieved feedback records on a frontend page must also be verified before marking all integration requirements as complete.
+- Displaying saved feedback on the frontend
+- Event name mapping in the feedback list
+- Navigation between Home, Events, Feedback, and View Feedback
+- Basic form validation and user-facing error messages
 
 ## Security Notes
 
 - Keep database credentials in the backend `.env` file.
 - Exclude `.env` files from Git using `.gitignore`.
-- Do not publish passwords, API secrets, or other private credentials.
+- Never publish passwords or other private credentials.
 - Validate user input on the server before saving it to the database.
+- Use environment variables for configuration that differs between development and deployment.
 
 ## Future Improvements
 
-- Add a dedicated frontend page to display submitted feedback, if not already implemented.
-- Improve email validation and user-facing error handling.
-- Add pagination or filtering for larger feedback lists.
+- Add search and filtering for feedback records.
+- Add pagination for larger feedback lists.
+- Improve email validation and accessibility.
 - Deploy the frontend and backend for public access.
+- Add authentication and role-based access if required for future versions.
 
 ## Internship Details
 
 **Organization:** Sysslan IT Solutions
+
 **Program:** Full Stack Development Internship
+
 **Project:** Event Feedback Management System
