@@ -1,6 +1,11 @@
-
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+
+const eventOptions = [
+  { id: '1', title: 'Web Development Workshop' },
+  { id: '2', title: 'AI & Machine Learning Seminar' },
+  { id: '3', title: 'Career & Placement Fair' },
+];
 
 function Feedback() {
   const [searchParams] = useSearchParams();
@@ -15,6 +20,7 @@ function Feedback() {
 
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -28,7 +34,16 @@ function Feedback() {
     setSuccess(false);
   }
 
-  
+  function handleRating(star) {
+    setFormData((prev) => ({
+      ...prev,
+      rating: star,
+    }));
+
+    setError('');
+    setSuccess(false);
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
 
@@ -46,6 +61,7 @@ function Feedback() {
     try {
       setError('');
       setSuccess(false);
+      setIsSubmitting(true);
 
       const response = await fetch(
         'http://localhost:5000/api/feedback',
@@ -54,14 +70,21 @@ function Feedback() {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({
+            ...formData,
+            name: formData.name.trim(),
+            email: formData.email.trim(),
+            comments: formData.comments.trim(),
+          }),
         }
       );
 
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message || 'Failed to submit feedback.');
+        throw new Error(
+          result.message || 'Failed to submit feedback.'
+        );
       }
 
       setSuccess(true);
@@ -73,168 +96,213 @@ function Feedback() {
         rating: 0,
         comments: '',
       });
-    } catch (error) {
-      setError(error.message || 'Unable to connect to the server.');
+    } catch (err) {
+      setError(
+        err.message || 'Unable to connect to the server.'
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
-
   return (
-    <main className="container py-5">
-      <div className="row justify-content-center">
-        <div className="col-lg-7 col-xl-6">
-          <div className="text-center mb-4">
-            <span className="badge bg-primary mb-3">
-              YOUR VOICE MATTERS
-            </span>
+    <main className="feedback-page">
+      <section className="container py-5">
+        <div className="feedback-heading text-center">
+          <span className="section-eyebrow">
+            YOUR VOICE MATTERS
+          </span>
 
-            <h1 className="fw-bold">Share Your Feedback</h1>
+          <h1 className="section-heading mt-3">
+            Share Your Feedback
+          </h1>
 
-            <p className="text-secondary">
-              Tell us about your event experience.
-            </p>
-          </div>
+          <p className="section-description">
+            Every opinion matters. Tell us about your experience
+            and help us make future events even better.
+          </p>
+        </div>
 
-          <div className="card border-0 shadow-sm">
-            <div className="card-body p-4 p-md-5">
-              {success && (
-                <div className="alert alert-success" role="status">
-                  Thank you! Your feedback was submitted successfully.
-                  <br />
-                  <small>
-                    This is a frontend demonstration; feedback is not
-                    saved to a database yet.
-                  </small>
-                </div>
-              )}
-
-              {error && (
-                <div className="alert alert-danger" role="alert">
-                  {error}
-                </div>
-              )}
-
-              <form onSubmit={handleSubmit}>
-                <div className="mb-3">
-                  <label htmlFor="name" className="form-label">
-                    Full Name
-                  </label>
-
-                  <input
-                    id="name"
-                    name="name"
-                    type="text"
-                    className="form-control"
-                    placeholder="Enter your full name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                  />
+        <div className="row justify-content-center">
+          <div className="col-lg-8 col-xl-7">
+            <div className="feedback-card">
+              <div className="feedback-card-header">
+                <div className="feedback-header-icon">
+                  💬
                 </div>
 
-                <div className="mb-3">
-                  <label htmlFor="email" className="form-label">
-                    Email Address
-                  </label>
-
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    className="form-control"
-                    placeholder="you@example.com"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                  />
+                <div>
+                  <h2>Event Review</h2>
+                  <p>Complete the form below to share your thoughts.</p>
                 </div>
+              </div>
 
-                <div className="mb-3">
-                  <label htmlFor="event" className="form-label">
-                    Select Event
-                  </label>
-
-                  <select
-                    id="event"
-                    name="event"
-                    className="form-select"
-                    value={formData.event}
-                    onChange={handleChange}
-                    required
+              <div className="feedback-card-body">
+                {success && (
+                  <div
+                    className="feedback-alert feedback-alert-success"
+                    role="status"
                   >
-                    <option value="">Choose an event</option>
-                    <option value="1">Web Development Workshop</option>
-                    <option value="2">AI & Machine Learning Seminar</option>
-                    <option value="3">Career & Placement Fair</option>
-                  </select>
-                </div>
-
-                <div className="mb-3">
-                  <label className="form-label d-block">
-                    Rate Your Experience
-                  </label>
-
-                  <div className="d-flex gap-2" role="group" aria-label="Rating from 1 to 5 stars">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        type="button"
-                        className="btn btn-link p-0 text-decoration-none"
-                        style={{ fontSize: '2rem' }}
-                        aria-label={`Rate ${star} out of 5 stars`}
-                        aria-pressed={formData.rating === star}
-                        onClick={() =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            rating: star,
-                          }))
-                        }
-                      >
-                        <span
-                          className={
-                            star <= formData.rating
-                              ? 'text-warning'
-                              : 'text-secondary'
-                          }
-                        >
-                          ★
-                        </span>
-                      </button>
-                    ))}
+                    <span aria-hidden="true">✓</span>
+                    <div>
+                      <strong>Feedback submitted successfully!</strong>
+                      <p>
+                        Thank you for sharing your experience.
+                        Your feedback has been saved.
+                      </p>
+                    </div>
                   </div>
+                )}
 
-                  <small className="text-secondary">
-                    {formData.rating
-                      ? `${formData.rating} out of 5 stars`
-                      : 'Select a star rating'}
-                  </small>
-                </div>
+                {error && (
+                  <div
+                    className="feedback-alert feedback-alert-error"
+                    role="alert"
+                  >
+                    <strong>Submission failed</strong>
+                    <p>{error}</p>
+                  </div>
+                )}
 
-                <div className="mb-4">
-                  <label htmlFor="comments" className="form-label">
-                    Your Comments
-                  </label>
+                <form onSubmit={handleSubmit}>
+                  <div className="row g-4">
+                    <div className="col-md-6">
+                      <label htmlFor="name" className="feedback-label">
+                        Full Name
+                      </label>
 
-                  <textarea
-                    id="comments"
-                    name="comments"
-                    className="form-control"
-                    rows="4"
-                    placeholder="Tell us what you liked or what we can improve..."
-                    value={formData.comments}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
+                      <input
+                        id="name"
+                        name="name"
+                        type="text"
+                        className="form-control feedback-input"
+                        placeholder="Enter your full name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        autoComplete="name"
+                        required
+                      />
+                    </div>
 
-                <button type="submit" className="btn btn-primary w-100 py-2">
-                  Submit Feedback
-                </button>
-              </form>
+                    <div className="col-md-6">
+                      <label htmlFor="email" className="feedback-label">
+                        Email Address
+                      </label>
+
+                      <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        className="form-control feedback-input"
+                        placeholder="you@example.com"
+                        value={formData.email}
+                        onChange={handleChange}
+                        autoComplete="email"
+                        required
+                      />
+                    </div>
+
+                    <div className="col-12">
+                      <label htmlFor="event" className="feedback-label">
+                        Select Event
+                      </label>
+
+                      <select
+                        id="event"
+                        name="event"
+                        className="form-select feedback-input"
+                        value={formData.event}
+                        onChange={handleChange}
+                        required
+                      >
+                        <option value="">Choose an event</option>
+
+                        {eventOptions.map((event) => (
+                          <option key={event.id} value={event.id}>
+                            {event.title}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="col-12">
+                      <label className="feedback-label d-block">
+                        Rate Your Experience
+                      </label>
+
+                      <div
+                        className="feedback-stars"
+                        role="group"
+                        aria-label="Rating from 1 to 5 stars"
+                      >
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            type="button"
+                            className={`feedback-star ${
+                              star <= formData.rating
+                                ? 'selected'
+                                : ''
+                            }`}
+                            aria-label={`Rate ${star} out of 5 stars`}
+                            aria-pressed={formData.rating === star}
+                            onClick={() => handleRating(star)}
+                          >
+                            ★
+                          </button>
+                        ))}
+                      </div>
+
+                      <p className="feedback-rating-text">
+                        {formData.rating
+                          ? `${formData.rating} out of 5 stars selected`
+                          : 'Select a rating from 1 to 5'}
+                      </p>
+                    </div>
+
+                    <div className="col-12">
+                      <label
+                        htmlFor="comments"
+                        className="feedback-label"
+                      >
+                        Your Comments
+                      </label>
+
+                      <textarea
+                        id="comments"
+                        name="comments"
+                        className="form-control feedback-input feedback-textarea"
+                        rows="5"
+                        placeholder="What did you like? What could we improve?"
+                        value={formData.comments}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+
+                    <div className="col-12">
+                      <button
+                        type="submit"
+                        className="feedback-submit-btn"
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting
+                          ? 'Submitting...'
+                          : 'Submit Feedback →'}
+                      </button>
+
+                      <p className="feedback-privacy-note">
+                        Your feedback helps organizers improve
+                        future events.
+                      </p>
+                    </div>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </main>
   );
 }

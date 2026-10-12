@@ -1,4 +1,3 @@
-
 const events = [
   {
     id: 1,
@@ -9,6 +8,7 @@ const events = [
     description:
       'Learn modern web development concepts, tools, and practical techniques.',
     icon: '💻',
+    color: 'event-purple',
   },
   {
     id: 2,
@@ -19,6 +19,7 @@ const events = [
     description:
       'Explore AI, machine learning applications, and emerging technology trends.',
     icon: '🤖',
+    color: 'event-blue',
   },
   {
     id: 3,
@@ -29,66 +30,84 @@ const events = [
     description:
       'Discover career opportunities and learn how to prepare for interviews.',
     icon: '🎯',
+    color: 'event-orange',
   },
 ];
 
 function Events() {
   return (
-    <main className="container py-5">
-      <div className="text-center mb-5">
-        <span className="badge bg-primary mb-3">
-          DISCOVER & PARTICIPATE
-        </span>
+    <main className="events-page">
+      <section className="events-heading">
+        <div className="container text-center">
+          <span className="section-eyebrow">
+            DISCOVER & PARTICIPATE
+          </span>
 
-        <h1 className="fw-bold">Upcoming Events</h1>
+          <h1 className="section-heading mt-3">
+            Explore Upcoming Events
+          </h1>
 
-        <p className="text-secondary">
-          Explore our events and share your experience with us.
-        </p>
-      </div>
+          <p className="section-description mx-auto">
+            Find your next experience, learn something new, and
+            share your feedback to make every event better.
+          </p>
+        </div>
+      </section>
 
-      <div className="row g-4">
-        {events.map((event) => (
-          <div className="col-md-6 col-lg-4" key={event.id}>
-            <div className="card h-100 border-0 shadow-sm">
-              <div className="bg-primary bg-opacity-10 text-center py-4">
-                <span style={{ fontSize: '4rem' }}>
-                  {event.icon}
-                </span>
-              </div>
+      <section className="container pb-5">
+        <div className="row g-4">
+          {events.map((event) => (
+            <div className="col-md-6 col-lg-4" key={event.id}>
+              <article className="event-card">
+                <div className={`event-card-banner ${event.color}`}>
+                  <span className="event-icon" aria-hidden="true">
+                    {event.icon}
+                  </span>
 
-              <div className="card-body d-flex flex-column p-4">
-                <span className="badge bg-light text-primary align-self-start mb-3">
-                  {event.category}
-                </span>
+                  <span className="event-category">
+                    {event.category}
+                  </span>
+                </div>
 
-                <h5 className="card-title fw-bold">
-                  {event.title}
-                </h5>
+                <div className="event-card-body">
+                  <h2 className="event-title">{event.title}</h2>
 
-                <p className="text-secondary small mb-2">
-                  📅 {event.date}
-                </p>
+                  <div className="event-meta">
+                    <p>
+                      <span aria-hidden="true">📅</span>
+                      <span>{event.date}</span>
+                    </p>
 
-                <p className="text-secondary small">
-                  📍 {event.location}
-                </p>
+                    <p>
+                      <span aria-hidden="true">📍</span>
+                      <span>{event.location}</span>
+                    </p>
+                  </div>
 
-                <p className="card-text text-secondary">
-                  {event.description}
-                </p>
+                  <p className="event-description">
+                    {event.description}
+                  </p>
 
-                <a
-                  href={`/feedback?event=${event.id}`}
-                  className="btn btn-primary mt-auto"
-                >
-                  Give Feedback →
-                </a>
-              </div>
+                  <a
+                    href={`/feedback?event=${event.id}`}
+                    className="event-feedback-btn"
+                  >
+                    Give Feedback <span aria-hidden="true">→</span>
+                  </a>
+                </div>
+              </article>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+
+        <div className="events-bottom-note">
+          <span aria-hidden="true">💜</span>
+          <p>
+            Attended an event? Your feedback helps create better
+            experiences for everyone.
+          </p>
+        </div>
+      </section>
     </main>
   );
 }
